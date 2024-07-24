@@ -12,10 +12,9 @@ import TransactionListWrapper from "./components/transaction-list-wrapper"
 import { createClient } from "@/lib/supabase/server"
 
 export default async function Page({ searchParams }) {
-  const range = searchParams?.range ?? 'last30days'
-
   const supabase = createClient()
   const { data: { user: { user_metadata: settings } } } = await supabase.auth.getUser()
+  const range = searchParams?.range ?? settings?.defaultView ?? 'last30days'
 
   return (<div className="space-y-8">
     <section className="flex justify-between items-center">
@@ -32,6 +31,7 @@ export default async function Page({ searchParams }) {
         </Suspense>
       </ErrorBoundary>)}
     </section>
+
     <section className="flex justify-between items-center">
       <h2 className="text-2xl">Transactions</h2>
       <Link href="/dashboard/transaction/add" className={`flex items-center space-x-1 ${variants['outline']} ${sizes['sm']}`}>
@@ -39,6 +39,7 @@ export default async function Page({ searchParams }) {
         <div>Add</div>
       </Link>
     </section>
+
     <Suspense fallback={<TransactionListFallback />}>
       <TransactionListWrapper range={range} />
     </Suspense>
